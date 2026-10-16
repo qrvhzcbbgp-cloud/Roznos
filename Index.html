@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PixVerse AI Studio Ultimate iOS Pro</title>
+    <style>
+        :root {
+            --bg-main: #070913;
+            --bg-panel: #101423;
+            --bg-card: #181f33;
+            --primary: #8338ec;
+            --primary-glow: rgba(131, 56, 236, 0.4);
+            --accent: #ff006e;
+            --text-main: #ffffff;
+            --text-muted: #8c95b2;
+            --border: rgba(255, 255, 255, 0.08);
+            --success: #38b000;
+        }
+
+        [data-theme="light"] {
+            --bg-main: #f4f6f9;
+            --bg-panel: #ffffff;
+            --bg-card: #eaedf2;
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.3);
+            --accent: #ec4899;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --border: rgba(0, 0, 0, 0.08);
+            --success: #16a34a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 480px;
+            margin: 0 auto;
+            overflow: hidden;
+            transition: background 0.3s ease;
+        }
+
+        /* HEADER */
+        header {
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 50;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .logo-text h1 {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .logo-text span {
+            font-size: 11px;
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .top-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-icon {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .btn-icon:active { transform: scale(0.9); }
+
+        /* ADVANCED CONFIG BAR */
+        .config-bar {
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
+            padding: 8px 16px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .config-bar::-webkit-scrollbar { display: none; }
+
+        .select-opt {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            outline: none;
+            white-space: nowrap;
+        }
+
+        /* NAVIGATION TABS (Chat vs Gallery) */
+        .nav-tabs {
+            display: flex;
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
+            padding: 0 16px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            border-bottom: 2px solid transparent;
+            transition: 0.2s;
+        }
+
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        /* CONTAINER VIEWS */
+        .view-section {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 16px;
+            scroll-behavior: smooth;
+        }
+
+        .view-section.active {
+            display: flex;
+        }
+
+        /* CHAT FEED */
+        .message-row {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 92%;
+            margin-bottom: 14px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .message-row.user { align-self: flex-end; }
+        .message-row.bot { align-self: flex-start; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bubble {
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 14px;
+            line-height: 1.45;
+            word-wrap: break-word;
+        }
+
+        .user .bubble {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .bot .bubble {
+            background: var(--bg-panel);
+            color: var(--text-main);
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        /* STUDIO CARD */
+        .studio-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            width: 100%;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            margin-top: 6px;
+        }
+
+        .studio-header {
+            padding: 10px 14px;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .progress-view {
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 12px;
+        }
+
+        .spinner-ring {
+            width: 38px;
+            height: 38px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .progress-bar-track {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-card);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 0.3s;
+        }
+
+        /* VIDEO PLAYER */
+        .video-player-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            display: none;
+        }
+
+        .video-player-wrap video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(4px);
+            color: white;
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+
+        .video-controls-bar {
+            padding: 10px 14px;
+            background: var(--bg-panel);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 6px;
+            justify-content: space-between;
+        }
+
+        .ctrl-btn {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 4px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .ctrl-btn:active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* GALLERY GRID */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .gallery-item {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .gallery-item-video {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            object-fit: cover;
+        }
+
+        .gallery-item-info {
+            padding: 12px;
+            font-size: 13px;
+        }
+
+        .gallery-item-info p {
+            color: var(--text-muted);
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        /* PRESETS CHIPS */
+        .presets-row {
+            display: flex;
+            gap: 6px;
+            padding: 6px 16px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            background: var(--bg-main);
+        }
+        .presets-row::-webkit-scrollbar { display: none; }
+
+        .preset-chip {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        /* FOOTER INPUT */
+        .footer-input {
+            background: var(--bg-panel);
+            border-top: 1px solid var(--border);
+            padding: 12px 16px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .input-box {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+        }
+
+        input {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--text-main);
+            font-size: 14px;
+            padding: 12px 0;
+        }
+
+        input::placeholder { color: var(--text-muted); }
+
+        .send-btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px var(--primary-glow);
+            flex-shrink: 0;
+        }
+
+        .send-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+            transform: translateX(1px);
+        }
+    </style>
+</head>
+<body data-theme="dark">
+
+    <header>
+        <div class="logo-area">
+            <div class="logo-icon">✨</div>
+            <div class="logo-text">
+                <h1>PixVerse iOS Pro</h1>
+                <span>🟢 Готовий до роботи</span>
+            </div>
+        </div>
+        <div class="top-btns">
+            <button class="btn-icon" onclick="toggleTheme()" title="Тема">🌓</button>
+            <button class="btn-icon" onclick="clearAllData()" title="Очистити все">🗑️</button>
+        </div>
+    </header>
+
+    <div class="config-bar">
+        <select class="select-opt" id="engineModel">
+            <option value="PixVerse-v3">Model: PixVerse v3.0 Ultra</option>
+            <option value="Sora-8K">Model: Sora Pro 8K</option>
+            <option value="Runway-Gen3">Model: Runway Gen-3 Alpha</option>
+        </select>
+        <select class="select-opt" id="aspectRatio">
+            <option value="16:9">16:9 (Landscape)</option>
+            <option value="9:16">9:16 (Stories / Reels)</option>
+            <option value="1:1">1:1 (Square)</option>
+        </select>
+        <select class="select-opt" id="fpsMode">
+            <option value="60">60 FPS Ultra Smooth</option>
+            <option value="30">30 FPS Standard</option>
+        </select>
+    </div>
+
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('chat', this)">💬 Генератор (Чат)</button>
+        <button class="tab-btn" onclick="switchTab('gallery', this)">📁 Моя Галерея (<span id="galleryCount">0</span>)</button>
+    </div>
+
+    <!-- CHAT VIEW SECTION -->
+    <div class="view-section active" id="chatSection">
+        <div id="chatFeed">
+            <div class="message-row bot">
+                <div class="bubble">Привіт! Я твій персональний AI-генератор відео у стилі PixVerse для iPhone. Напиши будь-яку фантазію, і я згенерую унікальне відео з можливістю збереження! 👇</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GALLERY VIEW SECTION -->
+    <div class="view-section" id="gallerySection">
+        <div class="gallery-grid" id="galleryGrid">
+            <!-- Збережені відео з'являтимуться тут -->
+        </div>
+    </div>
+
+    <div class="presets-row">
+        <div class="preset-chip" onclick="quickSend('Кіт у скафандрі гуляє поверхнею Марса')">🚀 Марсіанський кіт</div>
+        <div class="preset-chip" onclick="quickSend('Неонове кіберпанк місто під час сильної зливи')">🌆 Дощ у кіберпанку</div>
+        <div class="preset-chip" onclick="quickSend('Чарівний замок у хмарах на заході сонця')">🏰 Замок у хмарах</div>
+    </div>
+
+    <div class="footer-input">
+        <div class="input-box">
+            <input type="text" id="userInput" placeholder="Опишіть відео для генерації..." autocomplete="off">
+        </div>
+        <button class="send-btn" onclick="startGeneration()">
+            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+        </button>
+    </div>
+
+    <script>
+        const chatFeed = document.getElementById('chatFeed');
+        const galleryGrid = document.getElementById('galleryGrid');
+        const galleryCount = document.getElementById('galleryCount');
+        const userInput = document.getElementById('userInput');
+
+        // База даних згенерованих відео у пам'яті телефону
+        let savedVideos = JSON.parse(localStorage.getItem('pixverse_ios_gallery')) || [];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderGallery();
+        });
+
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') startGeneration();
+        });
+
+        function switchTab(tabName, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            
+            btn.classList.add('active');
+            if(tabName === 'chat') {
+                document.getElementById('chatSection').classList.add('active');
+            } else {
+                document.getElementById('gallerySection').classList.add('active');
+                renderGallery();
+            }
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            body.setAttribute('data-theme', body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+        }
+
+        function clearAllData() {
+            if(confirm("Очистити всю історію та галерею?")) {
+                localStorage.removeItem('pixverse_ios_gallery');
+                savedVideos = [];
+                chatFeed.innerHTML = `
+                    <div class="message-row bot">
+                        <div class="bubble">Історію та галерею очищено. Введіть новий запит!</div>
+                    </div>
+                `;
+                renderGallery();
+            }
+        }
+
+        function quickSend(text) {
+            userInput.value = text;
+            startGeneration();
+        }
+
+        function startGeneration() {
+            const query = userInput.value.trim();
+            if (!query) return;
+
+            appendMsg(query, 'user');
+            userInput.value = '';
+
+            const engine = document.getElementById('engineModel').value;
+            const ratio = document.getElementById('aspectRatio').value;
+            const fps = document.getElementById('fpsMode').value;
+            const uid = 'gen-' + Date.now();
+
+            const botHtml = `
+                <div class="bubble" style="margin-bottom: 6px;">Створення відео через <b>${engine}</b> (${ratio}, ${fps} FPS)... Чекайте на рендеринг дифузії.</div>
+                <div class="studio-card">
+                    <div class="studio-header">
+                        <span>⚡ Нейро-рендеринг iOS</span>
+                        <span id="${uid}-pct">0%</span>
+                    </div>
+                    <div class="progress-view" id="${uid}-loadbox">
+                        <div class="spinner-ring"></div>
+                        <span style="font-size: 12px; color: var(--text-muted);" id="${uid}-status-text">Синтез семантичних векторів...</span>
+                        <div class="progress-bar-track">
+                            <div class="progress-bar-fill" id="${uid}-bar"></div>
+                        </div>
+                    </div>
+                    <div class="video-player-wrap" id="${uid}-playerbox">
+                        <div class="video-badge">PixVerse • ${ratio}</div>
+                        <video id="${uid}-vid" playsinline webkit-playsinline muted loop>
+                            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                    <div class="video-controls-bar" id="${uid}-ctrls" style="display: none;">
+                        <button class="ctrl-btn" onclick="playVideo('${uid}-vid')">▶️ Старт</button>
+                        <button class="ctrl-btn" onclick="restartVideo('${uid}-vid')">🔄 Наново</button>
+                        <button class="ctrl-btn" onclick="toggleMute('${uid}-vid')">🔊 Звук</button>
+                        <button class="ctrl-btn" onclick="saveToGallery('${query.replace(/'/g, "")}')">💾 Зберегти</button>
+                    </div>
+                </div>
+            `;
+
+            appendMsg("", 'bot', botHtml);
+            runSimulation(uid, query);
+        }
+
+        function appendMsg(text, sender, html = '') {
+            const row = document.createElement('div');
+            row.className = `message-row ${sender}`;
+            
+            if (text) {
+                const b = document.createElement('div');
+                b.className = 'bubble';
+                b.textContent = text;
+                row.appendChild(b);
+            }
+            if (html) {
+                const h = document.createElement('div');
+                h.innerHTML = html;
+                row.appendChild(h);
+            }
+
+            chatFeed.appendChild(row);
+            chatSection.scrollTop = chatSection.scrollHeight;
+        }
+
+        function runSimulation(id, promptText) {
+            let p = 0;
+            const pctEl = document.getElementById(`${id}-pct`);
+            const barEl = document.getElementById(`${id}-bar`);
+            const statEl = document.getElementById(`${id}-status-text`);
+            const loadBox = document.getElementById(`${id}-loadbox`);
+            const playerBox = document.getElementById(`${id}-playerbox`);
+            const ctrls = document.getElementById(`${id}-ctrls`);
+            const vidEl = document.getElementById(`${id}-vid`);
+
+            const timer = setInterval(() => {
+                p += Math.floor(Math.random() * 14) + 6;
+                if (p >= 100) {
+                    p = 100;
+                    clearInterval(timer);
+                    pctEl.textContent = "Готово!";
+                    barEl.style.width = "100%";
+
+                    setTimeout(() => {
+                        loadBox.style.display = "none";
+                        playerBox.style.display = "block";
+                        ctrls.style.display = "flex";
+                        
+                        // Автоматичний запуск спеціально для iOS
+                        vidEl.play().catch(() => {});
+                        chatSection.scrollTop = chatSection.scrollHeight;
+
+                        // Автоматично додаємо в галерею
+                        saveToGallerySilent(promptText);
+                    }, 400);
+                } else {
+                    pctEl.textContent = p + "%";
+                    barEl.style.width = p + "%";
+                    if (p > 35 && p < 70) {
+                        statEl.textContent = "Побудова оптичного потоку та кадрів...";
+                    } else if (p >= 70) {
+                        statEl.textContent = "Фінальний апскейл та кодування...";
+                    }
+                }
+            }, 280);
+        }
+
+        function playVideo(vidId) {
+            const v = document.getElementById(vidId);
+            if (v.paused) v.play(); else v.pause();
+        }
+
+        function restartVideo(vidId) {
+            const v = document.getElementById(vidId);
+            v.currentTime = 0;
+            v.play();
+        }
+
+        function toggleMute(vidId) {
+            const v = document.getElementById(vidId);
+            v.muted = !v.muted;
+        }
+
+        function saveToGallerySilent(prompt) {
+            const videoItem = {
+                id: Date.now(),
+                prompt: prompt,
+                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+                date: new Date().toLocaleDateString()
+            };
+            // Уникаємо дублікатів
+            if(!savedVideos.some(v => v.prompt === prompt)) {
+                savedVideos.unshift(videoItem);
+                localStorage.setItem('pixverse_ios_gallery', JSON.stringify(savedVideos));
+                renderGallery();
+            }
+        }
+
+        function saveToGallery(prompt) {
+            saveToGallerySilent(prompt);
+            alert("Відео успішно збережено у вашу Галерею!");
+        }
+
+        function renderGallery() {
+            galleryCount.textContent = savedVideos.length;
+            if(savedVideos.length === 0) {
+                galleryGrid.innerHTML = `<p style="text-align: center; color: var(--text-muted); margin-top: 40px; font-size: 13px;">Галерея поки порожня. Згенеруйте своє перше відео у чаті!</p>`;
+                return;
+            }
+
+            galleryGrid.innerHTML = "";
+            savedVideos.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'gallery-item';
+                card.innerHTML = `
+                    <video class="gallery-item-video" playsinline webkit-playsinline controls src="${item.url}"></video>
+                    <div class="gallery-item-info">
+                        <strong>${item.prompt}</strong>
+                        <p>Створено: ${item.date}</p>
+                    </div>
+                `;
+                galleryGrid.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
